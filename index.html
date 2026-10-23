@@ -143,9 +143,9 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
 <section id="intro">
   <h2>How it <span>works</span></h2>
   <ol class="steps">
-    <li class="tonight" id="homeStep"><b>1</b><div><span class="when">Tonight · first</span>Add the app to your home screen, then open it from there. Do step 2 in the home-screen app, or the saved songs won’t be there.
-      <span class="how" id="howIphone"><b>iPhone:</b> in Safari, tap <b>Share</b> (the square with the ↑ arrow; on newer iPhones it’s inside the <b>•••</b> menu), then <b>Add to Home Screen</b> → <b>Add</b>. Opened from a text? Tap the compass to open it in Safari first.</span>
-      <span class="how" id="howAndroid" hidden><b>Android:</b> in Chrome, tap <b>⋮</b> (top right), then <b>Add to Home screen</b> → <b>Add</b>.</span></div></li>
+    <li class="tonight" id="homeStep"><b>1</b><div><span class="when">Tonight · first</span>Add the app to your home screen:
+      <span class="how"><b>Share</b> → <b>Add to Home Screen</b></span>
+      <span class="how">Then open it from your home screen and do step 2 there.</span></div></li>
     <li class="tonight"><b>2</b><div><span class="when">Tonight, on Wi‑Fi</span>Save the lyrics to your phone. Arena signal is terrible, and this makes the songs work without it.
       <button id="saveAll">⬇ Save all songs for offline</button></div></li>
     <li><b>3</b><div><span class="when">When a song starts</span>Tap <b>🎧 What song is this?</b> and hold your phone up. Or just tap the song in the list.</div></li>
@@ -265,7 +265,6 @@ $('hookBtn').onclick = () => {
   const installed = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
   const steps = [...document.querySelectorAll('.steps > li')];
   if (installed) { $('homeStep').remove(); steps.slice(1).forEach((li, i) => li.firstElementChild.textContent = i + 1); }
-  else if (/android/i.test(navigator.userAgent)) { $('howIphone').hidden = true; $('howAndroid').hidden = false; }
 })();
 
 // ---------- 🎧 song recognition (AudD) ----------
