@@ -32,8 +32,21 @@ body{
 }
 [hidden]{display:none!important}
 header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
-h1{font-family:var(--display);font-size:1.35rem;margin:0;letter-spacing:.01em}
+h1{font-family:var(--display);font-size:clamp(1.05rem,5.4vw,1.35rem);margin:0;letter-spacing:.01em}
 h1 span{color:var(--pink)}
+.brand{display:flex;align-items:center;gap:10px}
+.papis{display:flex;flex:none}
+.papis img{width:54px;height:54px;border-radius:50%;border:3px solid var(--pink);background:var(--haze)}
+.papis img+img{margin-left:-14px;border-color:var(--spot)}
+.dancers{display:flex;justify-content:center;gap:14px}
+.dancers figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.dancers img{width:72px;height:72px;border-radius:50%;border:3px solid #ffffff30}
+.dancers figcaption{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.dancing .dancers figure{animation:bop .5s ease-in-out infinite alternate}
+.dancing .dancers figure:nth-child(2){animation-delay:.17s}
+.dancing .dancers figure:nth-child(3){animation-delay:.33s}
+@keyframes bop{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-12px) rotate(6deg)}}
+@media (prefers-reduced-motion:reduce){.dancing .dancers figure{animation:none}}
 .now{color:var(--mist);font-size:.85rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 form{display:flex;gap:8px}
@@ -87,7 +100,10 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
 </head>
 <body>
 <header>
-  <div><h1>Papisitos<span>Cantantes</span></h1><div class="edition">Jay‑Z edition</div></div>
+  <div class="brand">
+    <div class="papis"><img src="img/juanpablo.png" alt="Papisito Juan Pablo"><img src="img/juliano.png" alt="Papisito Juliano"></div>
+    <div><h1>Papisitos<span>Cantantes</span></h1><div class="edition">Jay‑Z edition</div></div>
+  </div>
   <div class="now" id="nowPlaying">Pick a song to start</div>
 </header>
 
@@ -107,6 +123,11 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
 <section id="stage" aria-live="polite">
   <div class="label" id="mode">How it works</div>
   <div id="sing" class="vibe">Pick the song, tap “It started!” when the beat drops.</div>
+  <div class="dancers" id="dancers" aria-label="Backup dancers">
+    <figure><img src="img/hank.png" alt=""><figcaption>Hank</figcaption></figure>
+    <figure><img src="img/blanquita.png" alt=""><figcaption>Blanquita</figcaption></figure>
+    <figure><img src="img/trey.png" alt=""><figcaption>Trey</figcaption></figure>
+  </div>
   <div id="next">Only the lines the whole crowd sings show up big. Everything else, just vibe.</div>
 </section>
 
@@ -387,6 +408,8 @@ function tick() {
     lastKey = key;
     $('mode').textContent = mode;
     $('sing').className = vibe ? 'vibe' : '';
+    $('dancers').hidden = !vibe;
+    $('stage').classList.toggle('dancing', vibe && mode.startsWith('Just vibe'));
     $('sing').textContent = sing;
     $('next').innerHTML = next && !vibe ? esc(next) : next;
     [...$('all').children].forEach((li, j) => li.classList.toggle('cur', j === i));
