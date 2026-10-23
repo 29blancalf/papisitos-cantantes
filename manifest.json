@@ -1,0 +1,9 @@
+{
+  "name": "PapisitosCantantes",
+  "short_name": "Papisitos",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#170a24",
+  "theme_color": "#170a24",
+  "icons": [{ "src": "img/icon512.png", "sizes": "512x512", "type": "image/png" }]
+}

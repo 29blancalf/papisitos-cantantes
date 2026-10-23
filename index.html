@@ -17,6 +17,11 @@
 <link rel="apple-touch-icon" href="img/icon.png">
 <link rel="icon" type="image/png" href="img/icon.png">
 <meta name="apple-mobile-web-app-title" content="Papisitos">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#170a24">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Figtree:wght@400;600;800&display=swap">
 <style>
@@ -87,6 +92,8 @@ button:focus-visible,input:focus-visible,li:focus-visible{outline:3px solid var(
 .steps .when{display:block;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
 .steps .tonight{background:#ffd23f14;border:1px solid #ffd23f55;border-radius:14px;padding:12px}
 .steps .tonight>b:first-child{background:var(--spot);color:var(--night)}
+.steps .how{display:block;margin-top:6px;color:var(--mist);font-size:.9rem}
+.steps .how b{color:var(--ink)}
 .down{align-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;color:var(--pink);padding:8px 16px;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase}
 .down svg{width:52px;height:52px;animation:arrow 1s ease-in-out infinite}
 @keyframes arrow{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
@@ -136,11 +143,14 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
 <section id="intro">
   <h2>How it <span>works</span></h2>
   <ol class="steps">
-    <li class="tonight"><b>1</b><div><span class="when">Tonight, on Wi‑Fi</span>Save the lyrics to your phone. Arena signal is terrible, and this makes the songs work without it.
+    <li class="tonight" id="homeStep"><b>1</b><div><span class="when">Tonight · first</span>Add the app to your home screen, then open it from there. Do step 2 in the home-screen app, or the saved songs won’t be there.
+      <span class="how" id="howIphone"><b>iPhone:</b> in Safari, tap <b>Share</b> (the square with the ↑ arrow; on newer iPhones it’s inside the <b>•••</b> menu), then <b>Add to Home Screen</b> → <b>Add</b>. Opened from a text? Tap the compass to open it in Safari first.</span>
+      <span class="how" id="howAndroid" hidden><b>Android:</b> in Chrome, tap <b>⋮</b> (top right), then <b>Add to Home screen</b> → <b>Add</b>.</span></div></li>
+    <li class="tonight"><b>2</b><div><span class="when">Tonight, on Wi‑Fi</span>Save the lyrics to your phone. Arena signal is terrible, and this makes the songs work without it.
       <button id="saveAll">⬇ Save all songs for offline</button></div></li>
-    <li><b>2</b><div><span class="when">When a song starts</span>Tap <b>🎧 What song is this?</b> and hold your phone up. Or just tap the song in the list.</div></li>
-    <li><b>3</b><div><span class="when">Sing</span>Big <b style="color:var(--spot)">yellow lines</b> = everyone sings. When it says “Just vibe”, dance with Hank, Blanquita &amp; Trey.</div></li>
-    <li><b>4</b><div><span class="when">Out of sync?</span>Hit <b>🎯 The hook just started!</b> when the crowd starts the chorus.</div></li>
+    <li><b>3</b><div><span class="when">When a song starts</span>Tap <b>🎧 What song is this?</b> and hold your phone up. Or just tap the song in the list.</div></li>
+    <li><b>4</b><div><span class="when">Sing</span>Big <b style="color:var(--spot)">yellow lines</b> = everyone sings. When it says “Just vibe”, dance with Hank, Blanquita &amp; Trey.</div></li>
+    <li><b>5</b><div><span class="when">Out of sync?</span>Hit <b>🎯 The hook just started!</b> when the crowd starts the chorus.</div></li>
   </ol>
   <button class="down" id="toListen" aria-label="Go to the song finder">Let’s go
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M5 12l7 7 7-7"/></svg>
@@ -249,6 +259,14 @@ $('hookBtn').onclick = () => {
   if (now() == null) { pausedAt = null; }
   seek(starts.reduce((a, b) => Math.abs(b - t) < Math.abs(a - t) ? b : a));
 };
+
+// ---------- home screen step ----------
+(() => {
+  const installed = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  const steps = [...document.querySelectorAll('.steps > li')];
+  if (installed) { $('homeStep').remove(); steps.slice(1).forEach((li, i) => li.firstElementChild.textContent = i + 1); }
+  else if (/android/i.test(navigator.userAgent)) { $('howIphone').hidden = true; $('howAndroid').hidden = false; }
+})();
 
 // ---------- 🎧 song recognition (AudD) ----------
 const AUDD_TOKEN = '62c1dc32dc27ab8aaa3b6aadc45a84f1'; // paste token here; without one AudD allows a few free tries a day
