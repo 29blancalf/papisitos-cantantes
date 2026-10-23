@@ -77,7 +77,20 @@ button:focus-visible,input:focus-visible,li:focus-visible{outline:3px solid var(
 .setlist button{background:#ffffff10;color:var(--ink);font-weight:600;padding:9px 12px;border-radius:999px;font-size:.9rem}
 .setlist button:hover{background:#ffffff22}
 .setlist button.saved::after{content:" ✓";color:var(--spot)}
-#saveAll{width:100%;margin-top:10px}
+#saveAll{width:100%;margin-top:10px;background:var(--spot);color:var(--night);font-weight:800}
+#intro{min-height:calc(100svh - 110px);display:flex;flex-direction:column;justify-content:center;gap:18px}
+#intro h2{font-family:var(--display);font-size:clamp(1.6rem,7vw,2.2rem);margin:0;text-wrap:balance}
+#intro h2 span{color:var(--spot)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.steps li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;align-items:start;line-height:1.4}
+.steps li>b:first-child{display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--pink);font-family:var(--display);font-weight:400}
+.steps .when{display:block;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
+.steps .tonight{background:#ffd23f14;border:1px solid #ffd23f55;border-radius:14px;padding:12px}
+.steps .tonight>b:first-child{background:var(--spot);color:var(--night)}
+.down{align-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;color:var(--pink);padding:8px 16px;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase}
+.down svg{width:52px;height:52px;animation:arrow 1s ease-in-out infinite}
+@keyframes arrow{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+@media (prefers-reduced-motion:reduce){.down svg{animation:none}}
 .listen{width:100%;padding:20px;font-size:1.2rem;background:var(--pink);color:var(--ink);position:relative;overflow:hidden}
 .listen .bar{position:absolute;left:0;top:0;bottom:0;background:#ffffff33;width:0}
 .listen.on{animation:pulse 1s ease-in-out infinite}
@@ -120,12 +133,24 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
   <div class="now" id="nowPlaying">Pick a song to start</div>
 </header>
 
+<section id="intro">
+  <h2>How it <span>works</span></h2>
+  <ol class="steps">
+    <li class="tonight"><b>1</b><div><span class="when">Tonight, on Wi‑Fi</span>Save the lyrics to your phone. Arena signal is terrible, and this makes the songs work without it.
+      <button id="saveAll">⬇ Save all songs for offline</button></div></li>
+    <li><b>2</b><div><span class="when">When a song starts</span>Tap <b>🎧 What song is this?</b> and hold your phone up. Or just tap the song in the list.</div></li>
+    <li><b>3</b><div><span class="when">Sing</span>Big <b style="color:var(--spot)">yellow lines</b> = everyone sings. When it says “Just vibe”, dance with Hank, Blanquita &amp; Trey.</div></li>
+    <li><b>4</b><div><span class="when">Out of sync?</span>Hit <b>🎯 The hook just started!</b> when the crowd starts the chorus.</div></li>
+  </ol>
+  <button class="down" id="toListen" aria-label="Go to the song finder">Let’s go
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M5 12l7 7 7-7"/></svg>
+  </button>
+</section>
 <button class="listen" id="listenBtn"><span class="bar"></span><span class="txt">🎧 What song is this?</span></button>
 <p class="hint" id="heard">Hold your phone up during a part with a clear beat.</p>
 <div id="pick">
   <p class="hint">Or tap the song he’s playing:</p>
   <div class="setlist" id="setlist"></div>
-  <button class="ghost" id="saveAll">⬇ Save all songs for offline (do this on Wi‑Fi before the show)</button>
 </div>
 <form id="searchForm">
   <input id="q" placeholder="Not listed? Search any song" autocomplete="off">
@@ -133,7 +158,7 @@ summary{cursor:pointer;color:var(--mist);font-weight:600}
 </form>
 <ul id="results"></ul>
 
-<section id="stage" aria-live="polite">
+<section id="stage" aria-live="polite" hidden>
   <div class="label" id="mode">How it works</div>
   <div id="sing" class="vibe">Pick the song, tap “It started!” when the beat drops.</div>
   <div class="dancers" id="dancers" aria-label="Backup dancers">
@@ -202,6 +227,7 @@ async function getSong(id) {
     }
   }
 }
+if (SETLIST.every(([, id]) => cached(id))) $('saveAll').textContent = `✓ All ${SETLIST.length} songs saved. You’re ready.`;
 $('saveAll').onclick = async () => {
   const btns = [...$('setlist').children];
   let ok = 0;
@@ -211,7 +237,8 @@ $('saveAll').onclick = async () => {
   }
   $('saveAll').textContent = ok === btns.length ? `✓ All ${ok} songs saved. You’re ready.` : `Saved ${ok}/${btns.length}. Tap again to retry the rest.`;
 };
-$('change').onclick = () => { $('pick').hidden = false; $('searchForm').hidden = false; $('player').hidden = true; t0 = null; pausedAt = null; lines = [];
+$('toListen').onclick = () => $('listenBtn').scrollIntoView({ behavior: 'smooth', block: 'start' });
+$('change').onclick = () => { $('stage').hidden = true; $('pick').hidden = false; $('searchForm').hidden = false; $('player').hidden = true; t0 = null; pausedAt = null; lines = [];
   $('mode').textContent = 'Pick a song'; $('sing').className = 'vibe'; $('sing').textContent = 'What’s he playing?'; $('next').textContent = ''; window.scrollTo(0, 0); };
 
 // "Hook just started": jump to the chorus start closest to where we think we are.
@@ -350,7 +377,7 @@ function markMust(ls) {
 function loadSong(s) {
   lines = markMust(parseLrc(s.syncedLyrics));
   $('results').innerHTML = '';
-  $('pick').hidden = true; $('searchForm').hidden = true;
+  $('pick').hidden = true; $('searchForm').hidden = true; $('intro').hidden = true; $('stage').hidden = false; window.scrollTo(0, 0);
   $('nowPlaying').textContent = `${s.trackName} — ${s.artistName}`;
   $('player').hidden = false;
   t0 = null; pausedAt = null;
